@@ -13,65 +13,68 @@
         <link rel='stylesheet' href='https://tribefactory.netlify.app/css/base1.css'/>
         <title>2D Code Generator</title>
         <script>
-            $(function(){
-                $("#code").focus()	
-                
-            });
+		$(function(){
+			$("#code").focus()	
+
+		});
+		
+		
+		document.getElementById("but").addEventListener("change", async({target})=>{
+			document.getElementById("canvas").getContext("bitmaprenderer").transferFromImageBitmap((await qrGenerate(target.value)).transferToImageBitmap());
+		});
 
 
-			function inp_reset(){
-				$("#code").val("");
-				$("#code_img").hide("slow");
-				$("#code_img_link").hide("slow");
+		function inp_reset(){
+			$("#code").val("");
+			$("#code_img").hide("slow");
+			$("#code_img_link").hide("slow");
 
-			}
-
-
-            //*****************************************************************************
-            function qrParse(video){
-                const canvas = new OffscreenCanvas(240, 320);
-                const render = canvas.getContext("2d");
-
-                return new Promise((res)=>{
-                    const loop = setInterval(()=>{
-                        render.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                        const img = render.getImageData(0, 0, canvas.width, canvas.height);
-                        const result = jsQR(img.data, img.width, img.height);
-
-                        if(result){
-                            clearInterval(loop);
-                            return res(result.data);
-                        }
-                    }, 100);
-                });
-            }
+		}
 
 
+		//*****************************************************************************
+		function qrParse(video){
+			const canvas = new OffscreenCanvas(240, 320);
+			const render = canvas.getContext("2d");
 
-            //*************************************************
-            function qrGenerate(data){
-                const canvas = new OffscreenCanvas(1, 1);
+			return new Promise((res)=>{
+			    const loop = setInterval(()=>{
+				render.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-                return new Promise((res, rej) => QRCode.toCanvas(canvas, data, {}, err => !err ? res(canvas) : rej(err)));
-            }
+				const img = render.getImageData(0, 0, canvas.width, canvas.height);
+				const result = jsQR(img.data, img.width, img.height);
 
-            document.getElementById("data").addEventListener("change", async({target})=>{
-                document.getElementById("canvas").getContext("bitmaprenderer").transferFromImageBitmap((await qrGenerate(target.value)).transferToImageBitmap());
-            });
+				if(result){
+				    clearInterval(loop);
+				    return res(result.data);
+				}
+			    }, 100);
+			});
+		}
 
-            //*************************************************
-            (async()=>{
-                const video = document.getElementById("video");
-                video.srcObject = await navigator.mediaDevices.getUserMedia({
-                    audio: false,
-                    video: {
-                        facingMode: "environment"
-                    }
-                });
 
-                document.getElementById("result").value = await qrParse(video);
-            })();
+
+		//*************************************************
+		function qrGenerate(data){
+		const canvas = new OffscreenCanvas(1, 1);
+
+		return new Promise((res, rej) => QRCode.toCanvas(canvas, data, {}, err => !err ? res(canvas) : rej(err)));
+		}
+
+
+
+		//*************************************************
+		(async()=>{
+		const video = document.getElementById("video");
+		video.srcObject = await navigator.mediaDevices.getUserMedia({
+		    audio: false,
+		    video: {
+			facingMode: "environment"
+		    }
+		});
+
+		document.getElementById("result").value = await qrParse(video);
+		})();
 
 
 
@@ -80,22 +83,22 @@
 
 		<style>
         body {
-          /* ‰æ‘œƒtƒ@ƒCƒ‹‚Ìw’è */
+          /* ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«ã®æŒ‡å®š */
           background-image: url('https://lh3.googleusercontent.com/WDNf68MrMo0Qr4WftMatueeSCcU5N4AK5PfqzGRSehdGbQ3p_1MzrKIJUZj8YlSnAj0J6mAC7GaTP6vqPkhhhT3WvE9eSfVIpx77Clqk75Yj4Bh1bdifxvqsLICV-Bk_5STTVxm0HQn-W-KMdFm3gboPt7t3AqKpw1l5zCMtZJ2EqNvY7kUxL95h5OMAAyfsEBBmARNhZS_Ryitov2qieMAXw0OjVB0Wj6rIDljIaCH8BwVwZjqxhir0un3TmJgpCFzemtAQNjMjpRHGKyqtcGgo8x-vN1cti9VtvowTmsmNEXImoR0PxKYlMb5r-syMpGh8gYageN4AgIPVlj0z1cduL4vOTRlGSxfsEVZJUY0FaM-YCR3NJJhVM1DzjcGQ9oXRjYjuHNgIXLaMVyYw4NlNMloLxywrryYPGB0wGkdgbiUcli7y5BekEN8qvAN-dF1OyjrAAiQ_-O2RmnOdUc0XBl9rGxyYk1qe26R5-lzIaDrHyZnZUCmfg-OiO5bEgvhVvXJxeRwnfirZ3yrhRQ_PGy1uCi2SDiA9Himu2wB8RTZ_r8S94G1W5Zdj8nwo7sPXEzhM87Z23w89A8rVBlQ_1LuNmHqT5mRBKjTesQZ2Kn9vmbtEfiBnI_4oR1riN4lcbm7cHmg8w-fwiE_58UqW5Hyu9-uEPCiVQ76_nleJ9SIR8lxe6D0iX2oz6OfT3eEzE49DiR0r66mlgbYh_EZuzmZ5a8fPX6TtTGIDAV0McRiSSG3tf-ZpRNR7css6e5ddjMaOT6FW_UnYoa8=w1900?authuser=0');
           
-          /* ‰æ‘œ‚ğí‚É“V’n¶‰E‚Ì’†‰›‚É”z’u */
+          /* ç”»åƒã‚’å¸¸ã«å¤©åœ°å·¦å³ã®ä¸­å¤®ã«é…ç½® */
           background-position: center center;
           
-          /* ‰æ‘œ‚ğƒ^ƒCƒ‹ó‚ÉŒJ‚è•Ô‚µ•\¦‚µ‚È‚¢ */
+          /* ç”»åƒã‚’ã‚¿ã‚¤ãƒ«çŠ¶ã«ç¹°ã‚Šè¿”ã—è¡¨ç¤ºã—ãªã„ */
           background-repeat: no-repeat;
           
-          /* ƒRƒ“ƒeƒ“ƒc‚Ì‚‚³‚ª‰æ‘œ‚Ì‚‚³‚æ‚è‘å‚«‚¢A“®‚©‚È‚¢‚æ‚¤‚ÉŒÅ’è */
+          /* ã‚³ãƒ³ãƒ†ãƒ³ãƒ„ã®é«˜ã•ãŒç”»åƒã®é«˜ã•ã‚ˆã‚Šå¤§ãã„æ™‚ã€å‹•ã‹ãªã„ã‚ˆã†ã«å›ºå®š */
           background-attachment: fixed;
           
-          /* •\¦‚·‚éƒRƒ“ƒeƒi‚Ì‘å‚«‚³‚ÉŠî‚Ã‚¢‚ÄA”wŒi‰æ‘œ‚ğ’²® */
+          /* è¡¨ç¤ºã™ã‚‹ã‚³ãƒ³ãƒ†ãƒŠã®å¤§ãã•ã«åŸºã¥ã„ã¦ã€èƒŒæ™¯ç”»åƒã‚’èª¿æ•´ */
           background-size: cover;
           
-          /* ”wŒi‰æ‘œ‚ª“Ç‚İ‚Ü‚ê‚é‘O‚É•\¦‚³‚ê‚é”wŒi‚ÌƒJƒ‰[ */
+          /* èƒŒæ™¯ç”»åƒãŒèª­ã¿è¾¼ã¾ã‚Œã‚‹å‰ã«è¡¨ç¤ºã•ã‚Œã‚‹èƒŒæ™¯ã®ã‚«ãƒ©ãƒ¼ */
           background-color: #464646;
         }
 
@@ -115,9 +118,9 @@
 
 
             <input type="text" value="" name="code" id="data" class=" fnt_s24 mar_b5 op_90_bgc_lv01 shd2_3"><br />
-			<div class="fnt_c01 fnt_s12 mar_b15">QRƒR[ƒh‰»‚µ‚½‚¢•¶š—ñ‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢</div>
+			<div class="fnt_c01 fnt_s12 mar_b15">QRã‚³ãƒ¼ãƒ‰åŒ–ã—ãŸã„æ–‡å­—åˆ—ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„</div>
 
-    		<input type="button" value="GENERATE" class="bor_a_w1 bor_c01 bgc_lv_non fnt_s24 fnt_c04 pad_t5 pad_r10 pad_b5 pad_l10 w200 mar_b30 shd2_3" onclick="send_form()"><br />
+    		<input type="button" value="GENERATE" id="but" class="bor_a_w1 bor_c01 bgc_lv_non fnt_s24 fnt_c04 pad_t5 pad_r10 pad_b5 pad_l10 w200 mar_b30 shd2_3" onclick="send_form()"><br />
     		<input type="button" value="RESET" class="bor_a_w1 bor_c01 bgc_lv_non fnt_s12 fnt_c04 pad_t5 pad_r10 pad_b5 pad_l10 w120 mar_b100 shd2_3" onclick="inp_reset()"><br />
 
 
