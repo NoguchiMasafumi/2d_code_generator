@@ -1,61 +1,128 @@
 <html>
     <head>
-        <meta charset="utf-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
         <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 
         <script src="https://cdn.jsdelivr.net/npm/qrcode@latest/build/qrcode.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/jsqr@latest/dist/jsQR.min.js"></script>
 
-        <title>QR</title>
-    </head>
 
-    <body>
-        <textarea id="data"></textarea>
-        <input type="button" value="Generate">
+        <link rel="shortcut icon" href="favicon.ico">
+        <link rel='stylesheet' href='https://tribefactory.netlify.app/css/base1.css'/>
+        <title>2D Code Generator</title>
+        <script>
+            $(function(){
+                $("#code").focus()	
+                
+            });
 
-        <canvas id="canvas" width="240" height="240" style="display:block;"></canvas>
-    </body>
 
-    <script>
-        function qrParse(video){
-            const canvas = new OffscreenCanvas(240, 320);
-            const render = canvas.getContext("2d");
+			function inp_reset(){
+				$("#code").val("");
+				$("#code_img").hide("slow");
+				$("#code_img_link").hide("slow");
 
-            return new Promise((res)=>{
-                const loop = setInterval(()=>{
-                    render.drawImage(video, 0, 0, canvas.width, canvas.height);
+			}
 
-                    const img = render.getImageData(0, 0, canvas.width, canvas.height);
-                    const result = jsQR(img.data, img.width, img.height);
 
-                    if(result){
-                        clearInterval(loop);
-                        return res(result.data);
+            //*****************************************************************************
+            function qrParse(video){
+                const canvas = new OffscreenCanvas(240, 320);
+                const render = canvas.getContext("2d");
+
+                return new Promise((res)=>{
+                    const loop = setInterval(()=>{
+                        render.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                        const img = render.getImageData(0, 0, canvas.width, canvas.height);
+                        const result = jsQR(img.data, img.width, img.height);
+
+                        if(result){
+                            clearInterval(loop);
+                            return res(result.data);
+                        }
+                    }, 100);
+                });
+            }
+
+
+
+            //*************************************************
+            function qrGenerate(data){
+                const canvas = new OffscreenCanvas(1, 1);
+
+                return new Promise((res, rej) => QRCode.toCanvas(canvas, data, {}, err => !err ? res(canvas) : rej(err)));
+            }
+
+            document.getElementById("data").addEventListener("change", async({target})=>{
+                document.getElementById("canvas").getContext("bitmaprenderer").transferFromImageBitmap((await qrGenerate(target.value)).transferToImageBitmap());
+            });
+
+            //*************************************************
+            (async()=>{
+                const video = document.getElementById("video");
+                video.srcObject = await navigator.mediaDevices.getUserMedia({
+                    audio: false,
+                    video: {
+                        facingMode: "environment"
                     }
-                }, 100);
-            });
+                });
+
+                document.getElementById("result").value = await qrParse(video);
+            })();
+
+
+
+        </script>
+
+
+		<style>
+        body {
+          /* 画像ファイルの指定 */
+          background-image: url('https://lh3.googleusercontent.com/WDNf68MrMo0Qr4WftMatueeSCcU5N4AK5PfqzGRSehdGbQ3p_1MzrKIJUZj8YlSnAj0J6mAC7GaTP6vqPkhhhT3WvE9eSfVIpx77Clqk75Yj4Bh1bdifxvqsLICV-Bk_5STTVxm0HQn-W-KMdFm3gboPt7t3AqKpw1l5zCMtZJ2EqNvY7kUxL95h5OMAAyfsEBBmARNhZS_Ryitov2qieMAXw0OjVB0Wj6rIDljIaCH8BwVwZjqxhir0un3TmJgpCFzemtAQNjMjpRHGKyqtcGgo8x-vN1cti9VtvowTmsmNEXImoR0PxKYlMb5r-syMpGh8gYageN4AgIPVlj0z1cduL4vOTRlGSxfsEVZJUY0FaM-YCR3NJJhVM1DzjcGQ9oXRjYjuHNgIXLaMVyYw4NlNMloLxywrryYPGB0wGkdgbiUcli7y5BekEN8qvAN-dF1OyjrAAiQ_-O2RmnOdUc0XBl9rGxyYk1qe26R5-lzIaDrHyZnZUCmfg-OiO5bEgvhVvXJxeRwnfirZ3yrhRQ_PGy1uCi2SDiA9Himu2wB8RTZ_r8S94G1W5Zdj8nwo7sPXEzhM87Z23w89A8rVBlQ_1LuNmHqT5mRBKjTesQZ2Kn9vmbtEfiBnI_4oR1riN4lcbm7cHmg8w-fwiE_58UqW5Hyu9-uEPCiVQ76_nleJ9SIR8lxe6D0iX2oz6OfT3eEzE49DiR0r66mlgbYh_EZuzmZ5a8fPX6TtTGIDAV0McRiSSG3tf-ZpRNR7css6e5ddjMaOT6FW_UnYoa8=w1900?authuser=0');
+          
+          /* 画像を常に天地左右の中央に配置 */
+          background-position: center center;
+          
+          /* 画像をタイル状に繰り返し表示しない */
+          background-repeat: no-repeat;
+          
+          /* コンテンツの高さが画像の高さより大きい時、動かないように固定 */
+          background-attachment: fixed;
+          
+          /* 表示するコンテナの大きさに基づいて、背景画像を調整 */
+          background-size: cover;
+          
+          /* 背景画像が読み込まれる前に表示される背景のカラー */
+          background-color: #464646;
         }
 
-        function qrGenerate(data){
-            const canvas = new OffscreenCanvas(1, 1);
+        .code_back{background-image:url(../img/back2.jpg);}
+        #header{margin-bottom:50px;padding:2px 50px 2px 15px;}
+        </style>
 
-            return new Promise((res, rej) => QRCode.toCanvas(canvas, data, {}, err => !err ? res(canvas) : rej(err)));
-        }
+    </head>
+    
+    <body class="mar_a0">
 
-        document.getElementById("data").addEventListener("change", async({target})=>{
-            document.getElementById("canvas").getContext("bitmaprenderer").transferFromImageBitmap((await qrGenerate(target.value)).transferToImageBitmap());
-        });
+        <div class="op_30_bgc_lv04 fnt_c01 shd2_3" id="header">
+            <span class="fnt_s24 fnt_c01 fnt_st_arial fnt_b">2D Code Generator</span>
+        </div>
 
-        (async()=>{
-            const video = document.getElementById("video");
-            video.srcObject = await navigator.mediaDevices.getUserMedia({
-                audio: false,
-                video: {
-                    facingMode: "environment"
-                }
-            });
+	    <form name="form1" method="post" class="tex_cen mar_t70 pad_t100">
 
-            document.getElementById("result").value = await qrParse(video);
-        })();
-    </script>
+
+            <input type="text" value="" name="code" id="data" class=" fnt_s24 mar_b5 op_90_bgc_lv01 shd2_3"><br />
+			<div class="fnt_c01 fnt_s12 mar_b15">QRコード化したい文字列を入力してください</div>
+
+    		<input type="button" value="GENERATE" class="bor_a_w1 bor_c01 bgc_lv_non fnt_s24 fnt_c04 pad_t5 pad_r10 pad_b5 pad_l10 w200 mar_b30 shd2_3" onclick="send_form()"><br />
+    		<input type="button" value="RESET" class="bor_a_w1 bor_c01 bgc_lv_non fnt_s12 fnt_c04 pad_t5 pad_r10 pad_b5 pad_l10 w120 mar_b100 shd2_3" onclick="inp_reset()"><br />
+
+
+            <canvas id="canvas" width="240" height="240" style="display:block;"></canvas>
+
+        </form>
+    </body>
 </html>
